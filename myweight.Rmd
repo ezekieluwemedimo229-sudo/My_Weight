@@ -1,0 +1,1024 @@
+---
+title: "MY WEIGHT"
+output: html_document
+date: "2026-10-06"
+---
+#PHASE 1:
+#THIS CHUNK BASICALLY COLLECTS USERS INFORMATION AND CALCULATE THE BMI OF THE USER, USING THE INFORMATIONS ENTERED BY THE USER
+
+
+```{r}
+
+# MYWEIGHT - BMI & GOAL PLANNER
+
+
+
+# 1. GET USER INFORMATION
+#readline is used y developr to read an input line by line, execute it one line after another. 
+#as.numeric is used to convert data or objects to numbrs
+
+
+name = readline("Enter your name: ")
+
+age = as.numeric(
+  readline("Enter your age: ")
+)
+
+weight = as.numeric(
+  readline("Enter your current weight in kg: ")
+)
+
+height_feet = as.numeric(
+  readline("Enter your height in feet: ")
+)
+
+height_inches = as.numeric(
+  readline("Enter the remaining inches: ")
+)
+
+#NEXT; calculate BMI
+
+calculate_bmi = function(weight, height_feet, height_inches) {
+  
+# Convert feet to metres
+
+feet_m = height_feet * 0.3048
+  
+# Convert inches to metres
+
+inches_m = height_inches * 0.0254
+
+  
+# Total height in metres
+
+height_m = feet_m + inches_m
+
+  
+# Calculate BMI
+
+bmi <- weight / (height_m^2)
+  
+  return(bmi)
+}
+
+
+bmi =  calculate_bmi(
+  weight,
+  height_feet,
+  height_inches
+)
+
+
+#  DETERMINE BMI CATEGORY
+
+
+if (bmi < 18.5) {
+  
+  category = "Underweight"
+  
+} else if (bmi < 25) {
+  
+  category = "Normal weight"
+  
+} else if (bmi < 30) {
+  
+  category = "Overweight"
+  
+} else {
+  
+  category = "Obesity"
+  
+}
+
+
+# 4. DISPLAY BMI RESULT
+
+cat("\n")
+
+cat("==============================\n")
+
+cat("        MYWEIGHT RESULT       \n")
+
+cat("==============================\n")
+
+cat("Hello", name, "!\n")
+cat("Age:", age, "\n")
+cat("Current weight:", weight, "kg\n")
+cat("Your BMI:", round(bmi, 2), "\n")
+cat("BMI Category:", category, "\n")
+
+cat("==============================\n")
+
+
+# 5. RECOMMEND AN ACTION
+
+
+if (category == "Underweight") {
+  
+  cat("\n")
+  cat("MyWeight recommends considering a weight-gain plan.\n")
+  
+  plan_choice <- readline(
+    "Would you like to create a weight-gain plan? (yes/no): "
+  )
+  
+  
+} else if (category == "Normal weight") {
+  
+  cat("\n")
+  cat("Your BMI is currently within the normal range.\n")
+  
+  cat("MyWeight recommends monitoring your weight over time.\n")
+  
+  
+  plan_choice = readline(
+    "Would you like to set a personal weight goal anyway? (yes/no): "
+  )
+  
+  
+} else {
+  
+  cat("\n")
+  cat("MyWeight recommends considering a weight-management plan.\n")
+  
+  plan_choice = readline(
+    "Would you like to create a weight-management plan? (yes/no): "
+  )
+  
+}
+
+
+# 6. ASK FOR TARGET WEIGHT
+
+#tolower() is used to make upper case letters turn to lower case. Knowing R is case sesitive, YES entered by user will not work so tolower() converts users input incase of uppercase to lowercase
+
+
+
+if (tolower(plan_choice) == "yes") {
+  
+  target_weight = as.numeric(
+    readline("Enter your target weight in kg: ")
+  )
+  
+
+# 7. CALCULATE WEIGHT CHANGE
+
+  
+calculate_weight_change = function(current_weight, target_weight)
+  {
+    
+weight_change = target_weight - current_weight
+    
+    
+    if (weight_change < 0) {
+      
+      type = "Weight loss"
+      amount = abs(weight_change)
+      
+    } else if (weight_change > 0) {
+      
+      type = "Weight gain"
+      amount = weight_change
+      
+    } else {
+      
+      type = "No change"
+      amount = 0
+    }
+    
+    
+    return(list(
+      type = type,
+      amount = amount
+    ))
+  }
+  
+  
+# Run the function
+  
+  result = calculate_weight_change(
+    weight,
+    target_weight
+  )
+  
+  
+# 8. DISPLAY GOAL
+
+  
+  cat("\n")
+  cat("==============================\n")
+  cat("        YOUR GOAL             \n")
+  cat("==============================\n")
+  
+  cat("Goal:", result$type, "\n")
+  cat("Amount:", result$amount, "kg\n")
+  cat("Target weight:", target_weight, "kg\n")
+  
+  cat("==============================\n")
+  
+  
+} else {
+  
+  cat("\n")
+  cat("No goal created.\n")
+  cat("You can create a plan later.\n")
+  
+}
+```
+
+
+#PHASE 2;
+
+```{r}
+# PHASE 2:
+# THIS CHUNK CREATES THE USER'S WEIGHT PLAN
+# BASED ON THE GOAL CREATED IN PHASE 1
+
+
+# 1. ASK FOR THE NUMBER OF MONTHS
+
+months = as.numeric(
+  readline("How many months do you want to achieve your goal? ")
+)
+
+
+# 2. SET THE MAXIMUM NUMBER OF MONTHS
+
+if (result$type == "Weight loss") {
+  
+  max_months = 12
+  
+} else if (result$type == "Weight gain") {
+  
+  max_months = 6
+  
+}
+
+
+# 3. CHECK IF THE NUMBER OF MONTHS IS VALID
+
+if (months < 1) 
+  {
+  
+cat("Your plan must be at least 1 month.\n")
+  
+} else if (months > max_months) 
+  {
+  
+  cat(
+    "Your plan cannot exceed",
+    max_months,
+    "months for",
+    result$type,
+    ".\n"
+  )
+  
+} else {
+  
+  cat(
+    "Your",    result$type,     "plan will run for",    months,    "months.\n"
+  )
+  
+}
+
+
+# 4. CREATE MONTHLY TARGETS
+
+
+if (months >= 1 && months <= max_months) {
+  
+monthly_targets = seq(from = weight, to = target_weight,    length.out = months + 1 )
+  
+monthly_targets
+}
+
+plan = data.frame(  Month = 0:months, Target_Weight = monthly_targets)
+
+plan
+
+
+```
+```{r}
+# PHASE 3:
+# THIS CHUNK TRACKS THE USER'S ACTUAL WEIGHT
+# AND COMPARES IT WITH THEIR MONTHLY TARGET
+
+
+# 1. ASK WHICH MONTH THE USER IS CHECKING
+
+current_month = as.numeric(  readline("Which month are you currently checking?"))
+
+
+# 2. CHECK THAT THE MONTH IS VALID
+
+if (current_month < 1 || current_month > months) {
+  
+  cat("Invalid month. Please enter a month between 1 and", months, ".\n")
+  
+} else {
+  
+  cat("You are checking Month", current_month, ".\n")
+  
+}
+
+# 3. GET THE TARGET WEIGHT FOR THAT MONTH
+
+target_for_month = plan$Target_Weight[current_month + 1]
+
+cat("Your target weight for Month", current_month,  "is", round(target_for_month, 2),  "kg.\n")
+
+# 4. GET CURRENT WEIGHT
+
+actual_weight = as.numeric(readline("Enter your current weight in kg: "))
+
+
+# 5. COMPARE ACTUAL WEIGHT WITH TARGET
+
+difference = actual_weight - target_for_month
+
+cat(  "Difference from target:",round(abs(difference), 2),  "kg.\n")
+
+
+# 6. EVALUATE THE USER'S PROGRESS
+
+if (result$type == "Weight loss") {
+  
+  if (actual_weight <= target_for_month) {
+    
+    cat("\n")
+    cat("Great job, ", name, "!\n")
+    cat("You have met your target for Month ", current_month, ".\n", sep = "")
+    cat("Keep up the good work!\n")
+    
+  } else {
+    
+    cat("\n")
+    cat("You're making progress, ", name, "!\n")
+    cat("You are", round(actual_weight - target_for_month, 2), "kg above your target for this month.\n")
+    
+    cat("Don't be discouraged. Keep working toward your goal.\n")
+  }
+  
+  
+} else if (result$type == "Weight gain") {
+  
+  if (actual_weight >= target_for_month) {
+    
+    cat("\n")
+    cat("Great job, ", name, "!\n")
+    cat("You have met your target for Month ", current_month, ".\n", sep = "")
+    cat("Keep up the good work!\n")
+    
+  } else {
+    
+    cat("\n")
+    cat("Keep going, ", name, "!\n")
+    cat("You are",round(target_for_month - actual_weight, 2), "kg below your target for this month.\n"  )
+    cat("You still have time to work toward your goal.\n")
+  }
+}
+```
+
+
+#phase 4
+
+```{r}
+# PHASE 4:
+# THIS CHUNK STORES THE USER'S WEIGHT PROGRESS
+
+
+# 1. DETERMINE THE STATUS OF THE MONTH
+
+if (result$type == "Weight loss") {
+  
+if (actual_weight <= target_for_month) {
+    
+status = "Target met"
+    
+  } else
+    {
+    
+    status = "Not yet met"
+    
+  }
+  
+  
+} else if (result$type == "Weight gain") {
+  
+  if (actual_weight >= target_for_month) {
+    
+    status = "Target met"
+    
+  } else {
+    
+    status = "Not yet met"
+    
+  }
+}
+
+
+# 2. CALCULATE THE DIFFERENCE
+
+difference = actual_weight - target_for_month
+
+
+# 3. CREATE A RECORD FOR THIS MONTH
+
+progress_record = data.frame(
+  
+  Month = current_month,
+  
+  Target_Weight = target_for_month,
+  
+  Actual_Weight = actual_weight,
+  
+  Difference = difference,
+  
+  Status = status
+  
+)
+
+
+
+# 4. DISPLAY THE RECORD
+
+cat("\n")
+cat("==============================\n")
+cat("       PROGRESS RECORD        \n")
+cat("==============================\n")
+
+cat("Month:", progress_record$Month, "\n")
+cat("Target Weight:", progress_record$Target_Weight, "kg\n")
+cat("Actual Weight:", progress_record$Actual_Weight, "kg\n")
+cat("Difference:", progress_record$Difference, "kg\n")
+cat("Status:", progress_record$Status, "\n")
+
+cat("==============================\n")
+
+
+
+# 5. CREATE THE PROGRESS HISTORY
+
+progress_history = progress_record
+
+cat("\n")
+cat("==============================\n")
+cat("       PROGRESS HISTORY       \n")
+cat("==============================\n")
+
+cat("Month:", progress_history$Month, "\n")
+cat("Target Weight:", progress_history$Target_Weight, "kg\n")
+cat("Actual Weight:", progress_history$Actual_Weight, "kg\n")
+cat("Difference:", progress_history$Difference, "kg\n")
+cat("Status:", progress_history$Status, "\n")
+
+cat("==============================\n")
+```
+
+#phase 5
+#phase 5(b)
+```{r}
+# LOAD THE DATABASE PACKAGES
+
+library(DBI)
+library(RSQLite)
+```
+
+
+```{r}
+# CREATE / CONNECT TO THE MYWEIGHT DATABASE
+
+
+myweight_db = dbConnect(SQLite(), "myweight.db")
+
+
+cat("\n")
+cat("==============================\n")
+cat("       MYWEIGHT DATABASE      \n")
+cat("==============================\n")
+
+cat("Database connected successfully.\n")
+cat("Database:", "myweight.db", "\n")
+
+cat("==============================\n")
+
+
+
+
+# CREATE THE USERS TABLE
+
+
+dbExecute(myweight_db," CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY,  name TEXT, age INTEGER, weight REAL, height_feet REAL, height_inches REAL, bmi REAL, bmi_category TEXT )  ")
+
+
+cat("\n")
+cat("Users table created successfully.\n")
+```
+
+#phase 6
+```{r}
+# PHASE 6:
+# THIS CHUNK STORES THE USER'S INFORMATION
+# IN THE MYWEIGHT DATABASE
+
+
+user_data = data.frame(name = name,age = age, weight = weight,height_feet = height_feet, height_inches = height_inches, bmi = bmi,bmi_category = category)
+
+user_data
+
+
+# STORE THE USER'S INFORMATION IN THE USERS TABLE
+
+
+dbWriteTable( myweight_db, "users", user_data,append = TRUE, row.names = FALSE)
+
+
+cat("\n")
+cat("==============================\n")
+cat("       USER INFORMATION       \n")
+cat("==============================\n")
+
+cat("User information saved successfully.\n")
+
+cat("==============================\n")
+
+
+# RETRIEVE USERS FROM THE DATABASE
+
+
+saved_users = dbGetQuery(
+  myweight_db,
+  "SELECT * FROM users"
+)
+
+
+saved_users
+
+# DISPLAY THE SAVED USER INFORMATION
+
+
+cat("\n")
+cat("==============================\n")
+cat("      SAVED USER PROFILE      \n")
+cat("==============================\n")
+
+cat("User ID:", saved_users$user_id, "\n")
+cat("Name:", saved_users$name, "\n")
+cat("Age:", saved_users$age, "\n")
+cat("Weight:", saved_users$weight, "kg\n")
+cat("Height:", saved_users$height_feet, "ft",
+    saved_users$height_inches, "in\n")
+cat("BMI:", round(saved_users$bmi, 2), "\n")
+cat("BMI Category:", saved_users$bmi_category, "\n")
+
+cat("==============================\n")
+
+# CLOSE THE DATABASE CONNECTION
+
+
+dbDisconnect(myweight_db)
+
+
+cat("\n")
+cat("MyWeight database connection closed.\n")
+
+
+myweight_db = dbConnect(
+  SQLite(),
+  "myweight.db"
+)
+```
+
+
+```{r}
+# PHASE 7:
+# THIS CHUNK CREATES A TABLE FOR THE USER'S WEIGHT PLAN
+
+
+dbExecute(myweight_db,"CREATE TABLE IF NOT EXISTS plans (plan_id INTEGER PRIMARY KEY, user_id INTEGER, goal_type TEXT, starting_weight REAL, target_weight REAL, duration_months INTEGER ) ")
+
+
+cat("\n")
+cat("Plans table created successfully.\n")
+
+# PREPARE THE USER'S WEIGHT PLAN
+
+
+plan_data = data.frame(user_id = 1, goal_type = result$type,starting_weight = weight, target_weight = target_weight,duration_months = months)
+
+plan_data
+
+# SAVE THE USER'S PLAN TO THE DATABASE
+
+
+dbWriteTable( myweight_db, "plans", plan_data, append = TRUE, row.names = FALSE)
+
+
+cat("\n")
+cat("==============================\n")
+cat("       PLAN SAVED             \n")
+cat("==============================\n")
+
+cat("Your weight plan has been saved successfully.\n")
+
+cat("==============================\n")
+
+
+# RETRIEVE THE SAVED PLAN
+
+
+saved_plan = dbGetQuery(myweight_db,"SELECT * FROM plans")
+saved_plan
+
+# DISPLAY THE SAVED PLAN
+
+
+cat("\n")
+cat("==============================\n")
+cat("       YOUR SAVED PLAN        \n")
+cat("==============================\n")
+
+cat("Plan ID:", saved_plan$plan_id, "\n")
+cat("User ID:", saved_plan$user_id, "\n")
+cat("Goal:", saved_plan$goal_type, "\n")
+cat("Starting weight:", saved_plan$starting_weight, "kg\n")
+cat("Target weight:", saved_plan$target_weight, "kg\n")
+cat("Duration:", saved_plan$duration_months, "months\n")
+
+cat("==============================\n")
+
+```
+#PHASE 8
+
+
+```{r}
+# PHASE 8:
+# THIS CHUNK CREATES A TABLE FOR MONTHLY PROGRESS
+
+
+dbExecute(myweight_db,"CREATE TABLE IF NOT EXISTS progress (progress_id INTEGER PRIMARY KEY, plan_id INTEGER,month INTEGER,target_weight REAL,actual_weight REAL,difference REAL,status TEXT) ")
+
+
+cat("\n")
+cat("Progress table created successfully.\n")
+
+# PREPARE THE CURRENT MONTH'S PROGRESS
+
+
+progress_data = data.frame(plan_id = 1, month = current_month,target_weight =target_for_month, actual_weight = actual_weight, difference = difference, status = status)
+
+progress_data
+
+# SAVE THE MONTHLY PROGRESS
+
+
+dbWriteTable(myweight_db, "progress", progress_data,append = TRUE,row.names = FALSE)
+
+
+cat("\n")
+cat("==============================\n")
+cat("      PROGRESS SAVED          \n")
+cat("==============================\n")
+
+cat("Your monthly progress has been saved successfully.\n")
+
+cat("==============================\n")
+
+# RETRIEVE SAVED PROGRESS
+
+
+saved_progress = dbGetQuery(myweight_db,"SELECT * FROM progress")
+saved_progress
+
+
+# DISPLAY SAVED MONTHLY PROGRESS
+
+
+cat("\n")
+cat("==============================\n")
+cat("       MONTHLY PROGRESS       \n")
+cat("==============================\n")
+
+cat("Month:", saved_progress$month, "\n")
+
+cat("Target weight:",saved_progress$target_weight,"kg\n")
+
+cat("Actual weight:", saved_progress$actual_weight, "kg\n")
+
+cat("Difference:", saved_progress$difference, "kg\n")
+
+cat("Status:",saved_progress$status,"\n")
+
+cat("==============================\n")
+
+
+```
+#PHASE 9
+
+```{r}
+# PHASE 9:
+# RETRIEVE THE RECORDS FOR ONE SPECIFIC PLAN
+
+user_records = dbGetQuery(myweight_db, "SELECT u.user_id, u.name, u.age, u.weight AS starting_weight, u.bmi, u.bmi_category, p.plan_id, p.goal_type, p.target_weight AS final_target_weight, p.duration_months, pr.month, pr.target_weight AS monthly_target, pr.actual_weight,  pr.difference,  pr.status
+
+  FROM users AS u
+
+  INNER JOIN plans AS p
+    ON u.user_id = p.user_id
+
+  LEFT JOIN progress AS pr
+    ON p.plan_id = pr.plan_id
+
+  WHERE u.user_id = 1
+
+  ORDER BY pr.month ASC  ")
+
+print(user_records)
+
+
+```
+#PHASE 10
+```{r}
+# PHASE 10:
+# CHECK WHETHER THE CURRENT MONTH
+# HAS ALREADY BEEN RECORDED
+
+
+existing_progress = dbGetQuery(myweight_db,  "SELECT *FROM progress
+WHERE plan_id = 1
+    AND month = ?
+  ",
+  params = list(current_month)
+)
+
+
+if (nrow(existing_progress) > 0) {
+
+  cat("Progress for this month has already been recorded.\n")
+
+} else {
+
+  cat("This month has not been recorded yet.\n")
+}
+
+
+
+# SAVE PROGRESS ONLY IF IT HAS NOT BEEN RECORDED
+
+
+if (nrow(existing_progress) > 0) {
+
+  cat("Progress for this month already exists.\n")
+  
+  cat("No duplicate record was saved.\n")
+
+} else {
+
+  dbExecute(
+    myweight_db,
+    "
+    INSERT INTO progress (
+      plan_id,
+      month,
+      target_weight,
+      actual_weight,
+      difference,
+      status
+    )
+    VALUES (?, ?, ?, ?, ?, ?)
+    ",
+    params = list(
+      1,
+      current_month,
+      target_for_month,
+      actual_weight,
+      difference,
+      status
+    )
+  )
+
+  cat("Your progress has been saved successfully.\n")
+}
+```
+
+#PHASE 11
+```{r}
+# PHASE 11:
+# RETRIEVE THE USER'S COMPLETE PROGRESS HISTORY
+
+
+progress_history = dbGetQuery(
+  myweight_db,
+  "
+  SELECT
+    month,
+    target_weight,
+    actual_weight,
+    difference,
+    status
+  FROM progress
+  WHERE plan_id = 1
+  ORDER BY month ASC
+  "
+)
+
+
+progress_history
+
+
+
+# DISPLAY THE PROGRESS HISTORY
+
+
+if (nrow(progress_history) == 0) {
+
+  cat("No progress records found yet.\n")
+
+} else {
+
+  cat("\nYOUR WEIGHT PROGRESS HISTORY\n\n")
+
+  for (i in seq_len(nrow(progress_history))) {
+
+    cat("Month:", progress_history$month[i], "\n")
+
+    cat(
+      "Target weight:",
+      progress_history$target_weight[i],
+      "kg\n"
+    )
+
+    cat(
+      "Actual weight:",
+      progress_history$actual_weight[i],
+      "kg\n"
+    )
+
+    cat(
+      "Difference:",
+      progress_history$difference[i],
+      "kg\n"
+    )
+
+    cat(
+      "Status:",
+      progress_history$status[i],
+      "\n"
+    )
+
+    cat("\n------------------------------\n")
+  }
+}
+```
+
+#PHASE 12
+```{r}
+# LOAD THE GRAPHING PACKAGE
+
+library(ggplot2)
+
+# CREATE A GRAPH OF ACTUAL WEIGHT VS TARGET WEIGHT
+
+if (nrow(progress_history) > 0) {
+
+  ggplot(progress_history, aes(x = month)) +
+
+    geom_line(
+      aes(y = target_weight, color = "Target weight"),
+      linewidth = 1
+    ) +
+
+    geom_point(
+      aes(y = target_weight, color = "Target weight"),
+      size = 3
+    ) +
+
+    geom_line(
+      aes(y = actual_weight, color = "Actual weight"),
+      linewidth = 1
+    ) +
+
+    geom_point(
+      aes(y = actual_weight, color = "Actual weight"),
+      size = 3
+    ) +
+
+    labs(
+      title = "MyWeight Progress Tracker",
+      x = "Month",
+      y = "Weight (kg)",
+      color = "Measurement"
+    ) +
+
+    theme_minimal()
+
+} else {
+
+  cat("Record your progress to see your graph.\n")
+
+}
+```
+#PHASE 13
+```{r}
+saved_plans = dbGetQuery(
+  myweight_db,
+  "
+  SELECT
+    plan_id,
+    user_id,
+    goal_type,
+    starting_weight,
+    target_weight,
+    duration_months
+  FROM plans
+  ORDER BY plan_id DESC
+  "
+)
+
+print(saved_plans)
+
+```
+
+#PHASE 14;
+
+```{r}
+saved_users = dbGetQuery(
+  myweight_db,
+  "
+  SELECT user_id, name, age, weight, bmi_category
+  FROM users
+  ORDER BY user_id ASC
+  "
+)
+
+print(saved_users)
+
+saved_user_plans = dbGetQuery(
+  myweight_db,
+  "
+  SELECT
+    users.user_id,
+    users.name,
+    plans.plan_id,
+    plans.goal_type,
+    plans.starting_weight,
+    plans.target_weight,
+    plans.duration_months
+  FROM users
+  INNER JOIN plans
+    ON users.user_id = plans.user_id
+  ORDER BY plans.plan_id DESC
+  "
+)
+
+print(saved_user_plans)
+
+
+print(saved_user_plans$plan_id)
+print(saved_user_plans$user_id)
+```
+#PHASE 15
+
+```{r}
+available_plans = dbGetQuery(
+  myweight_db,
+  "
+  SELECT plan_id, goal_type, target_weight, duration_months
+  FROM plans
+  WHERE user_id = 1
+  ORDER BY plan_id DESC
+  "
+)
+
+print(available_plans)
+```
+#phase 15b
+```{r}
+selected_plan_id = 1
+
+progress_history = dbGetQuery(
+  myweight_db,
+  "
+  SELECT month, target_weight, actual_weight, difference, status
+  FROM progress
+  WHERE plan_id = ?
+  ORDER BY month ASC
+  ",
+  params = list(selected_plan_id)
+)
+
+print(progress_history)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
